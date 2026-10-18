@@ -1,0 +1,11 @@
+# FxGaze backend dependencies
+fastapi==0.115.12
+uvicorn[standard]==0.34.0
+python-multipart==0.0.20
+celery==5.4.0
+redis==5.2.1
+numpy>=2.1
+librosa==0.11.0
+soundfile==0.13.0
+httpx==0.28.1
+pytest==8.3.5

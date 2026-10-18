@@ -1,0 +1,40 @@
+services:
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis-data:/data
+
+  celery-worker:
+    build: ./backend
+    command: celery -A app.celery_app:app worker -Q fxgaze -c 1 --loglevel=info
+    environment:
+      FXGAZE_BROKER_URL: redis://redis:6379/0
+      FXGAZE_RESULT_BACKEND: redis://redis:6379/1
+      FXGAZE_UPLOAD_DIR: /data/uploads
+      FXGAZE_RESULTS_DIR: /data/results
+      # Point at an Ollama container or host running the Pathumma 8B GGUF:
+      FXGAZE_OLLAMA_URL: http://host.docker.internal:11434
+    volumes:
+      - shared-data:/data
+
+  ollama:
+    image: ollama/ollama:latest
+    ports:
+      - "11434:11434"
+    volumes:
+      - ollama-models:/root/.ollama
+    # GPU users: enable the lines below (requires NVIDIA Container Toolkit)
+    # deploy:
+    #   resources:
+    #     reservations:
+    #       devices:
+    #         - driver: nvidia
+    #           count: all
+    #           capabilities: [gpu]
+
+volumes:
+  redis-data:
+  ollama-models:
+  shared-data:
